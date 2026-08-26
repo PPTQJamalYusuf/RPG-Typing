@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pixel Crawler - Standalone RPG Typing Battle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Hidden input for mobile native keyboard integration -->
+  <input type="text" id="mobile-hidden-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+  <div id="game-wrapper">
+    <!-- Top Header Ribbon -->
+    <header id="game-header">
+      <div class="header-brand">
+        <span class="game-logo-icon">⚔️</span>
+        <h1 class="game-title">PIXEL CRAWLER</h1>
+        <div class="game-badge" id="program-badge">🟢 PROGRAM 1: KATA DASAR</div>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-pill score-pill" id="score-display">🏆 SKOR: 0</div>
+        <div class="stat-pill stage-pill" id="stage-display">🚩 WAVE: 1</div>
+        <button id="btn-touch-toggle" class="btn-touch-toggle" title="Nyalakan Keyboard Sentuh">📱 KEYBOARD ON</button>
+        <button id="btn-fullscreen" class="btn-fullscreen" title="Layar Penuh">⛶ FULLSCREEN</button>
+      </div>
+    </header>
+
+    <!-- Main Battle Content Area -->
+    <div id="main-content-layout">
+      <!-- Left: Battle Arena Viewport -->
+      <main id="screen-container">
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+        <!-- Arena HUD Overlay -->
+        <div id="hud-overlay">
+          <!-- Top Health Bars -->
+          <div class="arena-top-bar">
+            <!-- Team HP Pill -->
+            <div class="hud-hp-card team-status-card">
+              <div class="hp-info-row">
+                <span class="hp-label team-color">❤️ TIM PAHLAWAN</span>
+                <span id="team-hp-text" class="hp-value">100 / 100</span>
+              </div>
+              <div class="hp-bar-track">
+                <div id="team-hp-fill" class="team-hp-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <!-- Boss HP Pill -->
+            <div class="hud-hp-card boss-health-card">
+              <div class="hp-info-row">
+                <span id="boss-name" class="hp-label boss-color">👹 BEAST LORD IGNACIO</span>
+                <span id="boss-hp-text" class="hp-value">400 / 400</span>
+              </div>
+              <div class="hp-bar-track">
+                <div id="boss-hp-fill" class="boss-hp-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Target Word Floating Keycaps Box -->
+          <div class="target-word-card" id="target-card">
+            <div class="turn-indicator-text">
+              <span class="turn-label">GILIRAN:</span> <span id="current-hero-name">🛡️ TULIEN (KNIGHT)</span>
+            </div>
+            <div class="target-word-display" id="target-word-ui">
+              <!-- Dynamically populated keycaps -->
+            </div>
+          </div>
+        </div>
+
+        <!-- STAGE CLEAR MODAL -->
+        <div id="stage-clear-modal" class="modal-backdrop" style="display: none;">
+          <div class="modal-card">
+            <div class="modal-title">⭐ STAGE SELESAI! ⭐</div>
+            <div class="modal-stars" id="stage-stars">⭐⭐⭐</div>
+            <div class="modal-desc" id="stage-clear-desc">Bos berhasil dikalahkan! Seluruh tim pahlawan bersorak gembira.</div>
+            <button id="btn-next-wave" class="btn-modal-action">LANJUT KE WAVE BERIKUTNYA ➔</button>
+          </div>
+        </div>
+
+        <!-- GAME OVER MODAL -->
+        <div id="game-over-modal" class="modal-backdrop" style="display: none;">
+          <div class="modal-card" style="border-color: #ef4444;">
+            <div class="modal-title" style="color: #ef4444;">💀 GAME OVER 💀</div>
+            <div class="modal-desc">Seluruh anggota tim pahlawan telah gugur dalam pertempuran!</div>
+            <button id="btn-restart-game" class="btn-modal-action" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);">↺ BANGKIT & ULANGI PERTANDINGAN</button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right: Party Roster Sidebar -->
+      <aside id="party-sidebar">
+        <div class="sidebar-header">
+          <span>👥 ANGGOTA TIM</span>
+          <span>4 HEROES</span>
+        </div>
+        <div class="party-container" id="party-lineup-ui">
+          <!-- Dynamically populated 4 party hero cards -->
+        </div>
+      </aside>
+    </div>
+
+    <!-- On-Screen Virtual Keyboard for Mobile / Gadgets -->
+    <div id="virtual-keyboard-drawer">
+      <div class="kb-row">
+        <button class="touch-key" data-key="Q">Q</button>
+        <button class="touch-key" data-key="W">W</button>
+        <button class="touch-key" data-key="E">E</button>
+        <button class="touch-key" data-key="R">R</button>
+        <button class="touch-key" data-key="T">T</button>
+        <button class="touch-key" data-key="Y">Y</button>
+        <button class="touch-key" data-key="U">U</button>
+        <button class="touch-key" data-key="I">I</button>
+        <button class="touch-key" data-key="O">O</button>
+        <button class="touch-key" data-key="P">P</button>
+      </div>
+      <div class="kb-row">
+        <button class="touch-key" data-key="A">A</button>
+        <button class="touch-key" data-key="S">S</button>
+        <button class="touch-key" data-key="D">D</button>
+        <button class="touch-key" data-key="F">F</button>
+        <button class="touch-key" data-key="G">G</button>
+        <button class="touch-key" data-key="H">H</button>
+        <button class="touch-key" data-key="J">J</button>
+        <button class="touch-key" data-key="K">K</button>
+        <button class="touch-key" data-key="L">L</button>
+      </div>
+      <div class="kb-row">
+        <button class="touch-key" data-key="Z">Z</button>
+        <button class="touch-key" data-key="X">X</button>
+        <button class="touch-key" data-key="C">C</button>
+        <button class="touch-key" data-key="V">V</button>
+        <button class="touch-key" data-key="B">B</button>
+        <button class="touch-key" data-key="N">N</button>
+        <button class="touch-key" data-key="M">M</button>
+        <button class="touch-key space-key" data-key=" ">SPASI</button>
+      </div>
+    </div>
+
+    <!-- Bottom Controls Bar -->
+    <footer id="game-footer">
+      <div class="map-select-wrapper">
+        <label for="program-select">KURIKULUM:</label>
+        <select id="program-select">
+          <option value="program_1" selected>🟢 Program 1: Kata Dasar (3-4 Huruf)</option>
+          <option value="program_2">🟡 Program 2: Petualang Dungeon (5-7 Huruf)</option>
+          <option value="program_3">🔴 Program 3: Legenda Kerajaan (8-12 Huruf)</option>
+          <option value="program_4">⚔️ Program 4: RPG English Adventure</option>
+        </select>
+      </div>
+      <div class="footer-actions">
+        <button id="btn-skip-turn" class="btn-secondary" title="Lewati kata saat ini">⏭️ Lewati Kata</button>
+        <button id="btn-reset-pos" class="btn-secondary" title="Ulangi dari wave 1">↺ Reset Stage</button>
+        <button id="btn-toggle-sound" class="btn-secondary" title="Nyalakan / Matikan Suara">🔊 Suara: ON</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
